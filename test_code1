@@ -29,20 +29,7 @@
             body['close_notes'] = current.close_notes;
         }
         var body1 = JSON.stringify(body);
-
-        r.setRequestBody(body1);
-
-        var response = r.execute();
-        var responseBody = response.getBody();
-        var httpStatus = response.getStatusCode();
-
-        // capturing logs
-        if (httpStatus == 201 || httpStatus == 200) {
-            gs.log("CMH Integration: " + current.number + " is synced successfully.");
-
-        } else {
-            gs.log("CMH Integration: " + current.number + " Response Body: " + responseBody + " HttpStatus: " + httpStatus);
-        }
+//suraj test
 
     }
 })(current, previous);
