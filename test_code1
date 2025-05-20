@@ -1,0 +1,48 @@
+(function executeRule(current, previous /*null when async*/ ) {
+
+    if (gs.isInteractive()) {
+        var AccessToken = new cmhIntegrationUtils().getAccessToken(gs.getProperty('cmh_integration_ref_token'));
+        var body = {};
+        var r = new sn_ws.RESTMessageV2('CMH Rest Message', 'Update Incident');
+        r.setStringParameterNoEscape('access_token', AccessToken);
+
+        body['number'] = current.number;
+        // body['additional_comments'] = current.comments.getJournalEntry(1);
+
+        if (current.work_notes.changes() && current.comments.changes()) {
+            body['additional_comments'] = current.comments.getJournalEntry(1);
+            body['work_notes'] = current.work_notes.getJournalEntry(1);
+            body['state'] = current.getDisplayValue("state");
+
+        } else if (current.work_notes.changes()) {
+            body['work_notes'] = current.work_notes.getJournalEntry(1);
+            body['state'] = current.getDisplayValue("state");
+        } else if (current.comments.changes()) {
+            body['additional_comments'] = current.comments.getJournalEntry(1);
+            body['state'] = current.getDisplayValue("state");
+        }
+        if (current.state.changes() && current.state != 6 && current.state != 7) {
+            body['state'] = current.state.getDisplayValue();
+        }
+        if (current.state == 6) {
+            body['state'] = current.state.getDisplayValue();
+            body['close_notes'] = current.close_notes;
+        }
+        var body1 = JSON.stringify(body);
+
+        r.setRequestBody(body1);
+
+        var response = r.execute();
+        var responseBody = response.getBody();
+        var httpStatus = response.getStatusCode();
+
+        // capturing logs
+        if (httpStatus == 201 || httpStatus == 200) {
+            gs.log("CMH Integration: " + current.number + " is synced successfully.");
+
+        } else {
+            gs.log("CMH Integration: " + current.number + " Response Body: " + responseBody + " HttpStatus: " + httpStatus);
+        }
+
+    }
+})(current, previous);
