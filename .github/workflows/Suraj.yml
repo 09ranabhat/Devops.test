@@ -1,0 +1,20 @@
+name: Suraj Workflow
+
+on:
+   push:
+     branches:
+      - main
+
+jobs:
+  example-job:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/cehckout@v2
+
+    - name: UseGitHub API with PAT
+      env:
+         GITHUB_TOKEN: ${{ secrets.GH_APT }}
+      run: |
+          curl -H "Authorization: token $GITHUB_TOKEN" https://api.github.com/user
